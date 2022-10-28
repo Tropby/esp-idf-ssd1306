@@ -100,15 +100,30 @@ void ssd1306_display_text(SSD1306_t * dev, int page, char * text, int text_len, 
 		if (invert) ssd1306_invert(image, 8);
 		if (dev->_flip) ssd1306_flip(image, 8);
 		ssd1306_display_image(dev, page, seg, image, 8);
-#if 0
-		if (dev->_address == SPIAddress) {
-			spi_display_image(dev, page, seg, image, 8);
-		} else {
-			i2c_display_image(dev, page, seg, image, 8);
-		}
-#endif
 		seg = seg + 8;
 	}
+}
+
+void ssd1306_display_text_ex(SSD1306_t *dev, int page, char *text, int text_len, bool * invertMap)
+{
+    if (page >= dev->_pages)
+        return;
+    int _text_len = text_len;
+    if (_text_len > 16)
+        _text_len = 16;
+
+    uint8_t seg = 0;
+    uint8_t image[8];
+    for (uint8_t i = 0; i < _text_len; i++)
+    {
+        memcpy(image, font8x8_basic_tr[(uint8_t)text[i]], 8);
+        if (invertMap[i])
+            ssd1306_invert(image, 8);
+        if (dev->_flip)
+            ssd1306_flip(image, 8);
+        ssd1306_display_image(dev, page, seg, image, 8);
+        seg = seg + 8;
+    }
 }
 
 // by Coert Vonk
